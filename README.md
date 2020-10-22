@@ -1,68 +1,55 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# FrontEnd Assignment
 
-## Available Scripts
+> Create a Weather App using React
 
-In the project directory, you can run:
+Create a web-application using React as presented below.
 
-### `yarn start`
+## 💻 Built with
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- [Reactjs](https://reactjs.org/)
+- [Javascript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) (ES6+)
+- [React-redux](https://redux.js.org/): for state managment
+- [@reduxjs/toolkit](https://redux-toolkit.js.org/): for state managment
+- [react-window-dynamic-list](https://github.com/gnir-work/react-window-dynamic-list): for virtualized list
+- [Styled-components](https://styled-components.com/): for styling
+- [Axios](https://github.com/axios/axios): for fetching data
+- [React Testing Library](https://testing-library.com/): for unit-testing
+- [Husky](https://typicode.github.io/husky/#/): for improving workflow
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## 🛠️ Installation Steps
 
-### `yarn test`
+1. Clone the repository
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+git clone https://github.com/Achiaga/Frontend-Interview-Questions.git
+```
 
-### `yarn build`
+2. Change the working directory
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+cd frontend-assignment-alfonso/
+```
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+3. Install dependencies
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+yarn install
+```
 
-### `yarn eject`
+4. Run the app
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+yarn start
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+🌟 You are all set!
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## 🧪 Run Tests
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+(After installing the repository)
 
-## Learn More
+1. Run test
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+```bash
+yarn test
+```
