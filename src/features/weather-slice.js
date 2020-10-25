@@ -12,7 +12,7 @@ export const weatherSlice = createSlice({
 	name: 'weather',
 	initialState: {
 		citiesList: [],
-		municipalitiesList: [],
+		towns: [],
 		city: '20',
 		municipality: '',
 		weather: {},
@@ -21,7 +21,7 @@ export const weatherSlice = createSlice({
 	reducers: {
 		addCities: (state, action) => {
 			state.citiesList = action.payload[0].provincias;
-			state.municipalitiesList = action.payload[1];
+			state.towns = action.payload[1];
 		},
 		updateLocationStatus: (state, action) => {
 			state.locationStatus = action.payload;
@@ -46,7 +46,6 @@ export const requestLocation = () => async (dispatch) => {
 	try {
 		dispatch(updateLocationStatus(LOADING));
 		const results = await Promise.all([fetchCities(), fetchMunicipality()]);
-		console.log(results);
 		dispatch(updateLocationStatus(SUCCESS));
 		dispatch(addCities(results));
 	} catch (err) {
@@ -71,8 +70,9 @@ export const requestWeatherByLocation = () => async (dispatch) => {
 	}
 };
 
-// export const getJokes = (state) => state.jokes;
-// export const getAllCities = (state) => getJokes(state).categories;
+export const getJokes = (state) => state.weather;
+export const getAllCities = (state) => getJokes(state).citiesList;
+export const getAllTowns = (state) => getJokes(state).towns;
 // export const getCityStatus = (state) =>
 // 	parseAPIStatus(getJokes(state).fetchCategoriesStatus);
 
