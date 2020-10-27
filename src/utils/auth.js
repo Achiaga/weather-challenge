@@ -9,7 +9,7 @@ export const signInUser = (email, password) => {
 export const signOutUser = () => {
 	return firebase.auth().signOut();
 };
-export const persistantAuth = () => {
+export const addPersistantAuth = () => {
 	return firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 };
 export const emailVerification = () => {

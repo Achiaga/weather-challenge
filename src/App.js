@@ -1,35 +1,35 @@
 import React, { useEffect } from 'react';
-import { batch, useDispatch } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+
 import Home from './components/home';
-import SearchInput from './components/search';
+import Modal from './components/modal';
 import UserWeather from './components/user-weather';
+import Profile from './components/user-settings';
 import Navbar from './components/navbar';
-import {
-	requestCheckPersistantUser,
-	requestSavedCities,
-} from './features/user-slice';
-import { requestLocation } from './features/weather-slice';
+
+import { requestGetUser } from './features/user-slice';
+import { requestCity } from './features/weather-slice';
+import {} from './features/modal-slice';
 
 function App() {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
 		batch(() => {
-			dispatch(requestLocation());
-			dispatch(requestCheckPersistantUser());
+			dispatch(requestCity());
+			dispatch(requestGetUser());
 		});
-		// dispatch(requestSavedCities());
 	});
 
 	return (
 		<Router>
 			<Navbar />
+			<Modal modalType='search' />
 			<Switch>
 				<Route exact path='/' component={Home} />
-				<Route path='/search' component={SearchInput} />
 				<Route path='/user-weather' component={UserWeather} />
-				{/* <Route path="/account-settings" component={AccountSettings} /> */}
+				<Route path='/profile' component={Profile} />
 			</Switch>
 		</Router>
 	);

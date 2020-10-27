@@ -1,18 +1,13 @@
-import { CITIES, TOWNS } from '../constants';
-
-const getItemName = (item, type) => {
-	const itemKey = { cities: 'NOMBRE_PROVINCIA', towns: 'NOMBRE' }[type];
-	return item[itemKey];
-};
+import { CITIES } from '../constants';
 
 const normalize = (list, label) => {
 	const options = list.reduce(
-		(cities, cityName) => [...cities, { label: getItemName(cityName, label) }],
+		(cities, cityName) => [...cities, { label: cityName.name }],
 		[]
 	);
 	return { label, options };
 };
 
-export const normalizeData = ({ cities, towns }) => {
-	return [normalize(cities, CITIES), normalize(towns, TOWNS)];
+export const normalizeData = ({ cities }) => {
+	return [normalize(cities, CITIES)];
 };

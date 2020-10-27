@@ -1,43 +1,61 @@
 import React, { useEffect, useState } from 'react';
-import { EuiComboBox } from '@elastic/eui';
+import { EuiComboBox, EuiButton } from '@elastic/eui';
 import '@elastic/eui/dist/eui_theme_light.css';
-import { useDispatch } from 'react-redux';
-import { requestAddCity, requestSavedCities } from '../../features/user-slice';
+import { batch, useDispatch } from 'react-redux';
+import { updateModalState } from '../../features/modal-slice';
+
+import { hasAllData } from './utils';
+import { SEARCH_PLACEHOLDER } from '../../constants';
+
+import { requestAddCity } from '../../features/user-slice';
 import { denormalizeData } from '../../utils/denormalize';
 import { normalizeData } from '../../utils/normalize';
-import { hasAllData } from './utils';
 
-const SearchInput = ({ cities, towns, userID }) => {
-	const [selectedOptions, setSelected] = useState([]);
-	const [selectedCities, setSelectedCities] = useState([]);
-	const [options, setOptions] = useState();
+const SearchInput = ({ cities, userID }) => {
 	const dispatch = useDispatch();
 
+	const [selectedOptions, setSelected] = useState([]);
+	const [options, setOptions] = useState();
+
 	useEffect(() => {
-		if (hasAllData(cities, towns)) {
-			setOptions(normalizeData({ cities, towns }));
+		if (hasAllData(cities)) {
+			setOptions(normalizeData({ cities }));
 		}
-	}, [cities, towns]);
+	}, [cities]);
 
 	const onChange = (selectedOptions) => {
 		setSelected(selectedOptions);
-		setSelectedCities(denormalizeData(selectedOptions));
 	};
 
 	const handleAddCityFav = () => {
-		dispatch(requestAddCity(userID, selectedCities));
+		batch(() => {
+			dispatch(updateModalState(false));
+			dispatch(
+				requestAddCity(userID, denormalizeData(selectedOptions, cities))
+			);
+		});
 		setSelected([]);
 	};
 
 	return (
 		<>
 			<EuiComboBox
-				placeholder='Select one or more options'
+				placeholder={SEARCH_PLACEHOLDER}
 				options={options}
 				selectedOptions={selectedOptions}
 				onChange={onChange}
+				style={{ paddingTop: '40px' }}
 			/>
-			<button onClick={handleAddCityFav}>Add to Favorites</button>
+			<EuiButton
+				style={{
+					display: 'flex',
+					justifyContent: 'center',
+					margin: 'auto',
+					marginTop: '30px',
+				}}
+				onClick={handleAddCityFav}>
+				Add to Favorites
+			</EuiButton>
 		</>
 	);
 };

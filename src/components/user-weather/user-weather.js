@@ -1,72 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import firebase from '../../firebase/firebase';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
-import {
-	requestLocation,
-	requestWeatherByLocation,
-} from '../../features/weather-slice';
-import {
-	requestSignUp,
-	requestSignIn,
-	requestSignOut,
-} from '../../features/user-slice';
+import { Link } from 'react-router-dom';
+import { EuiIcon } from '@elastic/eui';
+import { useDispatch, useSelector } from 'react-redux';
+import { requestWeatherByLocation } from '../../features/weather-slice';
+import { getCitiesSaved } from '../../features/user-slice';
 
 const Wrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	h3 {
-		padding: 1em 0;
+`;
+
+const Header = styled.div`
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	width: 100%;
+	border-bottom: 1px solid black;
+`;
+
+const Title = styled.h1`
+	font-size: 25px;
+	padding: 1em 0;
+`;
+
+const Profile = styled.div`
+	position: absolute;
+	right: 13px;
+	top: 15%;
+	border: 1px solid black;
+	border-radius: 50%;
+	padding: 10px;
+	a {
+		text-decoration: none;
+		color: #5a5a5a;
+		svg {
+			color: black;
+		}
 	}
 `;
 
 const UserWeather = () => {
 	const dispatch = useDispatch();
-	const [user, setUser] = useState();
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
 
-	const handleEmail = (e) => {
-		const { value } = e.target;
-		setEmail(value);
-	};
+	const citiesSaved = useSelector(getCitiesSaved);
 
-	const handlePassword = (e) => {
-		const { value } = e.target;
-		setPassword(value);
-	};
-
-	const handleSignUp = () => {
-		dispatch(requestSignUp('alfonsodiezachiaga@gmail.com', '1234567'));
-	};
-
-	const handleSignIn = () => {
-		dispatch(requestSignIn('alfonso.achiaga@gmail.com', '1234567'));
-	};
-
-	const handlesSignOut = () => {
-		dispatch(requestSignOut());
-	};
+	useEffect(() => {
+		dispatch(requestWeatherByLocation(citiesSaved));
+	}, [citiesSaved]);
 
 	return (
 		<Wrapper>
-			{!user ? <h3>Login to see your weather list</h3> : user.email}
-			<input onChange={handleEmail} />
-			<br />
-			<input onChange={handlePassword} />
-			<br />
-			<button onClick={handleSignUp}>Sign Up</button>
-			<br />
-			<input onChange={handleEmail} />
-			<br />
-			<input onChange={handlePassword} />
-			<br />
-			<button onClick={handleSignIn}>Login</button>
-			<br />
-			<button onClick={handlesSignOut}>Log out</button>
-			<br />
+			<Header>
+				<Title>My Weather</Title>
+				<Profile>
+					<Link to='/profile'>
+						<EuiIcon type='user' size='l' />
+					</Link>
+				</Profile>
+			</Header>
 		</Wrapper>
 	);
 };
