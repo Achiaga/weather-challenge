@@ -15,6 +15,13 @@ export const addPersistantAuth = () => {
 export const emailVerification = () => {
 	return firebase.auth().currentUser.sendEmailVerification();
 };
+export const deleteUser = () => {
+	const user = firebase.auth().currentUser;
+	user.delete().then(function () {
+		console.log('deleted');
+	});
+	return;
+};
 export const checkPersistantUser = () => {
 	return new Promise((resolve, reject) => {
 		try {

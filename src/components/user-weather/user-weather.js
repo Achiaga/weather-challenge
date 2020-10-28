@@ -1,68 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { EuiIcon } from '@elastic/eui';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestWeatherByLocation } from '../../features/weather-slice';
-import { getCitiesSaved } from '../../features/user-slice';
-
-const Wrapper = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-`;
-
-const Header = styled.div`
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	position: relative;
-	width: 100%;
-	border-bottom: 1px solid black;
-`;
-
-const Title = styled.h1`
-	font-size: 25px;
-	padding: 1em 0;
-`;
-
-const Profile = styled.div`
-	position: absolute;
-	right: 13px;
-	top: 15%;
-	border: 1px solid black;
-	border-radius: 50%;
-	padding: 10px;
-	a {
-		text-decoration: none;
-		color: #5a5a5a;
-		svg {
-			color: black;
-		}
-	}
-`;
+import { getCitiesSaved, getIsUserAuth } from '../../features/user-slice';
+import { updateModalState } from '../../features/modal-slice';
+import {
+	requestWeatherByLocation,
+	getSavedCitiesWeather,
+	getWeatherStatus,
+	getSavedCitiesWeatherStatus,
+} from '../../features/weather-slice';
+import ErrorPage from '../error';
+import LoadingPage from '../loading';
+import './user-weather.css';
+import EmptyState from '../empty-state';
+import FavCitieslist from './fav-cities-weather';
 
 const UserWeather = () => {
 	const dispatch = useDispatch();
+	const { isSuccess: weatherSuccess, hasError: weatherError } = useSelector(
+		getWeatherStatus
+	);
+	const {
+		isLoading: savedCitiesLoading,
+		isSuccess: savedCitiesSucces,
+		hasError: savedCitiesError,
+	} = useSelector(getSavedCitiesWeatherStatus);
 
 	const citiesSaved = useSelector(getCitiesSaved);
+	const savedCitiesWeather = useSelector(getSavedCitiesWeather);
+	const auth = useSelector(getIsUserAuth);
 
-	useEffect(() => {
-		dispatch(requestWeatherByLocation(citiesSaved));
-	}, [citiesSaved]);
+	// useEffect(() => {
+	// 	dispatch(requestWeatherByLocation(citiesSaved));
+	// }, [citiesSaved]);
+
+	const handleAddCity = () => {
+		dispatch(updateModalState(true));
+	};
+
+	if (weatherError || savedCitiesError) return <ErrorPage />;
+
+	if (savedCitiesLoading) return <LoadingPage />;
 
 	return (
-		<Wrapper>
-			<Header>
-				<Title>My Weather</Title>
-				<Profile>
+		<div className='user-weather-wrapper'>
+			<div className='user-weather-header'>
+				<h1 className='user-weather-title'>My Weather</h1>
+				<div className='user-weather-profile'>
 					<Link to='/profile'>
-						<EuiIcon type='user' size='l' />
+						<EuiIcon type='managementApp' size='xl' />
 					</Link>
-				</Profile>
-			</Header>
-		</Wrapper>
+				</div>
+			</div>
+			{!auth && <EmptyState />}
+			<FavCitieslist savedCitiesWeather={savedCitiesWeather} />
+			{auth && (
+				<EuiIcon
+					onClick={handleAddCity}
+					style={{ marginTop: '1em' }}
+					type='listAdd'
+					size='l'
+				/>
+			)}
+		</div>
 	);
 };
 export default UserWeather;

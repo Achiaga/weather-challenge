@@ -1,16 +1,23 @@
-import { createSlice } from '@reduxjs/toolkit';
-import firebase from '../firebase/firebase';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { batch } from 'react-redux';
+import parseAPIStatus from '../utils/parse-api-status';
 import { LOADING, SUCCESS, ERROR } from '../constants';
 import {
 	createUser,
 	signInUser,
 	signOutUser,
 	addPersistantAuth,
+	deleteUser,
 	emailVerification,
 	checkPersistantUser,
 } from '../utils/auth';
+import { fetchCities } from '../utils/transporter';
 import { addUserData, readUserData } from '../utils/database';
-import { batch } from 'react-redux';
+import {
+	requestWeatherByLocation,
+	requestCity,
+	updateWeatherStatus,
+} from './weather-slice';
 
 export const userSlice = createSlice({
 	name: 'user',
@@ -21,15 +28,21 @@ export const userSlice = createSlice({
 		citiesSaved: [],
 		signUpStatus: '',
 		signInStatus: '',
+		signUserError: '',
 		signOutStatus: '',
 		saveUserDataStatus: '',
 		addUserDataStatus: '',
 		savedCitiesStatus: '',
+		isAuth: true,
 	},
 	reducers: {
 		addUserInfo: (state, action) => {
 			state.userId = action.payload.userId;
+			state.isAuth = !!action.payload.userId;
 			state.email = action.payload.email;
+		},
+		upateUserIsAuth: (state, action) => {
+			state.isAuth = action.payload.userId;
 		},
 		updateCitiesSaved: (state, action) => {
 			action.payload.map(
@@ -54,6 +67,9 @@ export const userSlice = createSlice({
 		updateSavedCitiesStatus: (state, action) => {
 			state.savedCitiesStatus = action.payload;
 		},
+		updateSignUserError: (state, action) => {
+			state.signUserError = action.payload;
+		},
 	},
 });
 
@@ -66,15 +82,18 @@ export const {
 	updateSaveUserDataStatus,
 	updateAddCityFirebaseStatus,
 	updateSavedCitiesStatus,
+	upateUserIsAuth,
+	updateSignUserError,
 } = userSlice.actions;
 
 const requestSavedCities = (userId) => async (dispatch) => {
 	try {
-		dispatch(updateSavedCitiesStatus(LOADING));
+		// dispatch(updateSavedCitiesStatus(LOADING));
 		const results = await readUserData(userId);
 		batch(() => {
 			dispatch(updateSavedCitiesStatus(SUCCESS));
 			dispatch(updateCitiesSaved(results));
+			dispatch(requestWeatherByLocation(results));
 		});
 	} catch (err) {
 		console.error('fail update data user request');
@@ -82,10 +101,10 @@ const requestSavedCities = (userId) => async (dispatch) => {
 	}
 };
 
-export const requestGetUser = () => async (dispatch) => {
+export const requestGetUser = (user) => async (dispatch) => {
 	try {
-		let user = await checkPersistantUser();
 		if (user) {
+			console.log(user.emailVerified);
 			batch(() => {
 				dispatch(addUserInfo({ email: user.email, userId: user.uid }));
 				dispatch(requestSavedCities(user.uid));
@@ -108,7 +127,8 @@ export const requestSignUp = (email, password) => async (dispatch) => {
 		// await emailVerification();
 		await addPersistantAuth();
 	} catch (err) {
-		console.error('fail sign up request');
+		console.error('fail sign up request', err);
+		dispatch(updateSignUserError(err.message));
 		dispatch(updateSignUpStatus(ERROR));
 	}
 };
@@ -124,7 +144,8 @@ export const requestSignIn = (email, password) => async (dispatch) => {
 		});
 		await addPersistantAuth();
 	} catch (err) {
-		console.error('fail sign in request');
+		console.error('fail sign in request', err);
+		dispatch(updateSignUserError(err.message));
 		dispatch(updateSignInStatus(ERROR));
 	}
 };
@@ -134,7 +155,7 @@ export const requestSignOut = () => async (dispatch) => {
 		dispatch(updateSignOutStatus(LOADING));
 		await signOutUser();
 		batch(() => {
-			dispatch(addUserInfo({ email: '', userId: '' }));
+			dispatch(addUserInfo({ email: null, userId: null }));
 			dispatch(updateSignOutStatus(SUCCESS));
 		});
 	} catch (err) {
@@ -143,15 +164,24 @@ export const requestSignOut = () => async (dispatch) => {
 	}
 };
 
+export const requestDeleteUser = () => async (dispatch) => {
+	try {
+		await deleteUser();
+	} catch (err) {
+		console.error('fail delete user', err);
+	}
+};
+
 export const requestAddCity = (userId, cities) => async (dispatch) => {
 	try {
-		dispatch(updateAddCityFirebaseStatus(LOADING));
+		// dispatch(updateAddCityFirebaseStatus(LOADING));
 		cities.map(async (city) => {
 			await addUserData(userId, city);
 		});
 		batch(() => {
 			dispatch(updateAddCityFirebaseStatus(SUCCESS));
 			dispatch(updateCitiesSaved(cities));
+			dispatch(requestSavedCities(userId));
 		});
 	} catch (err) {
 		console.error('fail update data user request');
@@ -159,8 +189,31 @@ export const requestAddCity = (userId, cities) => async (dispatch) => {
 	}
 };
 
+export const getUserInitialPayload = () => async (dispatch) => {
+	try {
+		dispatch(updateWeatherStatus(LOADING));
+		fetchCities().then((results) => dispatch(requestCity(results)));
+		const user = await checkPersistantUser();
+		if (!user) return dispatch(upateUserIsAuth(false));
+		dispatch(requestSavedCities(user.uid));
+		dispatch(updateWeatherStatus(SUCCESS));
+		batch(() => {
+			dispatch(requestGetUser(user));
+		});
+	} catch (err) {
+		console.error(err);
+	}
+};
+
 export const getUserState = (state) => state.user;
 export const getUserId = (state) => getUserState(state).userId;
+export const getIsUserAuth = (state) => getUserState(state).isAuth;
+export const getUserEmail = (state) => getUserState(state).email;
 export const getCitiesSaved = (state) => getUserState(state).citiesSaved;
+export const getSignUserError = (state) => getUserState(state).signUserError;
+export const getSignInStatus = (state) =>
+	parseAPIStatus(getUserState(state).signInStatus);
+export const getSignUpStatus = (state) =>
+	parseAPIStatus(getUserState(state).signUpStatus);
 
 export default userSlice.reducer;
