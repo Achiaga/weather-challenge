@@ -1,7 +1,9 @@
+import { LOADING, SUCCESS, ERROR } from '../constants';
+
 const parseApiStatus = (apiStatus) => {
-	const isLoading = apiStatus === 'loading';
-	const isSuccess = apiStatus === 'success';
-	const hasError = apiStatus === 'error';
+	const isLoading = apiStatus === LOADING;
+	const isSuccess = apiStatus === SUCCESS;
+	const hasError = apiStatus === ERROR;
 	return { isLoading, isSuccess, hasError };
 };
 

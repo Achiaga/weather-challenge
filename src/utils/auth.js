@@ -9,11 +9,18 @@ export const signInUser = (email, password) => {
 export const signOutUser = () => {
 	return firebase.auth().signOut();
 };
-export const persistantAuth = () => {
+export const addPersistantAuth = () => {
 	return firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 };
 export const emailVerification = () => {
 	return firebase.auth().currentUser.sendEmailVerification();
+};
+export const deleteUser = () => {
+	const user = firebase.auth().currentUser;
+	user.delete().then(function () {
+		console.log('deleted');
+	});
+	return;
 };
 export const checkPersistantUser = () => {
 	return new Promise((resolve, reject) => {

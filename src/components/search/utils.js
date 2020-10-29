@@ -1,3 +1,3 @@
-export const hasAllData = (cities, towns) => {
-	return cities.length && towns.length;
+export const hasAllData = (cities) => {
+	return cities.length;
 };

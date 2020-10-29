@@ -1,27 +1,32 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-	fetchCities,
-	fetchMunicipality,
-	fetchCityWeather,
-	fetchMunicipalityWeather,
-} from '../utils/transporter';
+import { fetchCities, fetchCityWeather } from '../utils/transporter';
 import { LOADING, SUCCESS, ERROR } from '../constants';
 import parseAPIStatus from '../utils/parse-api-status';
+import { deleteCityUser } from '../utils/database';
+import { batch } from 'react-redux';
+import axios from 'axios';
+
+import history from '../utils/history';
+import { updateModalState } from './modal-slice';
 
 export const weatherSlice = createSlice({
 	name: 'weather',
 	initialState: {
-		citiesList: [],
-		towns: [],
-		city: '20',
-		municipality: '',
-		weather: {},
-		locationStatus: '',
+		cities: [],
+		weather: [],
+		savedCitiesWeather: [],
+		weatherStatus: '',
+		savedCitiesWeatherStatus: '',
 	},
 	reducers: {
 		addCities: (state, action) => {
-			state.citiesList = action.payload[0].provincias;
-			state.towns = action.payload[1];
+			state.cities = action.payload;
+		},
+		removeCities: (state, action) => {
+			const index = state.savedCitiesWeather.findIndex(
+				(item) => action.payload === item.municipio.NOMBRE
+			);
+			state.savedCitiesWeather.splice(index, 1);
 		},
 		updateLocationStatus: (state, action) => {
 			state.locationStatus = action.payload;
@@ -30,50 +35,132 @@ export const weatherSlice = createSlice({
 			state.weather = action.payload;
 		},
 		updateWeatherStatus: (state, action) => {
-			state.locationStatus = action.payload;
+			state.weatherStatus = action.payload;
+		},
+		updateCitiesWeather: (state, action) => {
+			state.savedCitiesWeather = action.payload;
+		},
+		updateSavedCitiesWeatherStatus: (state, action) => {
+			state.savedCitiesWeatherStatus = action.payload;
 		},
 	},
 });
 
 export const {
 	addCities,
-	updateLocationStatus,
+	removeCities,
 	addWeather,
+	updateCitiesWeather,
 	updateWeatherStatus,
+	updateSavedCitiesWeatherStatus,
 } = weatherSlice.actions;
 
-export const requestLocation = () => async (dispatch) => {
-	try {
-		dispatch(updateLocationStatus(LOADING));
-		const results = await Promise.all([fetchCities(), fetchMunicipality()]);
-		dispatch(updateLocationStatus(SUCCESS));
-		dispatch(addCities(results));
-	} catch (err) {
-		console.error('fail category request');
-		dispatch(updateLocationStatus(ERROR));
-	}
+const getCityWeather = async (cities) => {
+	const cityWeatherPromises = cities.map((city) => {
+		return fetchCityWeather(city.codeCity, city.codeTown);
+	});
+	const citiesWeather = await Promise.all(cityWeatherPromises);
+	return citiesWeather;
 };
 
-export const requestWeatherByLocation = () => async (dispatch) => {
+const getCityCode = (city, cities) => {
+	return cities.filter((cityInfo) => {
+		return cityInfo.name.toLowerCase() === city.toLowerCase();
+	});
+};
+
+export const requestAndSaveCities = (rawCities) => async (dispatch) => {
 	try {
 		dispatch(updateWeatherStatus(LOADING));
-		const results = await Promise.all([
-			fetchCityWeather(),
-			fetchMunicipalityWeather(),
-		]);
-		console.log(results);
-		dispatch(updateWeatherStatus(SUCCESS));
-		dispatch(addWeather(results));
+		const cities = rawCities.map((city) => {
+			return {
+				name: city.NOMBRE,
+				codeCity: city.CODPROV,
+				codeTown: city.CODIGOINE.slice(0, 5),
+			};
+		});
+		dispatch(addCities(cities));
+		const data = await axios({
+			method: 'get',
+			url: 'http://ip-api.com/json',
+		});
+		const cityWeather = await getCityWeather(
+			getCityCode(data.data.city, cities)
+		);
+		batch(() => {
+			dispatch(addWeather(cityWeather));
+			dispatch(updateWeatherStatus(SUCCESS));
+		});
 	} catch (err) {
-		console.error('fail category request');
+		console.error('fail category request', err);
 		dispatch(updateWeatherStatus(ERROR));
 	}
 };
 
-export const getJokes = (state) => state.weather;
-export const getAllCities = (state) => getJokes(state).citiesList;
-export const getAllTowns = (state) => getJokes(state).towns;
-// export const getCityStatus = (state) =>
-// 	parseAPIStatus(getJokes(state).fetchCategoriesStatus);
+export const updateMainWeatherScreen = (cityWeather) => (dispatch) => {
+	dispatch(addWeather(cityWeather));
+};
+
+export const requestUpdateAddWeather = (city) => async (dispatch, getState) => {
+	try {
+		dispatch(updateSavedCitiesWeatherStatus(LOADING));
+		const cityWeather = await getCityWeather(city);
+		batch(() => {
+			dispatch(updateMainWeatherScreen(cityWeather));
+			dispatch(updateModalState(false));
+			dispatch(updateSavedCitiesWeatherStatus(SUCCESS));
+		});
+	} catch (err) {
+		console.error('fail category request', err);
+		dispatch(updateSavedCitiesWeatherStatus(ERROR));
+	}
+};
+
+//TODO:  change names
+export const requestWeatherByLocation = (savedCities) => async (
+	dispatch,
+	getState
+) => {
+	const hasCitiesSaved = getSavedCitiesWeather(getState()).length;
+	if (!hasCitiesSaved) dispatch(updateSavedCitiesWeatherStatus(LOADING));
+	requestInitialLocationWeather(savedCities);
+};
+
+//TODO:  change names
+export const requestInitialLocationWeather = (savedCities) => async (
+	dispatch
+) => {
+	try {
+		dispatch(updateSavedCitiesWeatherStatus(LOADING));
+		const cityWeather = await getCityWeather(savedCities);
+		batch(() => {
+			dispatch(updateCitiesWeather(cityWeather));
+			dispatch(updateSavedCitiesWeatherStatus(SUCCESS));
+		});
+	} catch (err) {
+		console.error('fail category request', err);
+		dispatch(updateSavedCitiesWeatherStatus(ERROR));
+	}
+};
+
+export const requestDeleteCity = (userId, city) => async (dispatch) => {
+	try {
+		const deleteCity = await deleteCityUser(userId, city);
+		dispatch(removeCities(city));
+	} catch (err) {
+		console.error('fail category request', err);
+		dispatch(updateSavedCitiesWeatherStatus(ERROR));
+	}
+};
+
+export const getWeather = (state) => state.weather;
+export const getAllCities = (state) => getWeather(state).cities;
+export const getWeatherData = (state) => getWeather(state).weather;
+export const getSavedCitiesWeather = (state) =>
+	getWeather(state).savedCitiesWeather;
+export const getWeatherStatus = (state) =>
+	parseAPIStatus(getWeather(state).weatherStatus);
+export const getSavedCitiesWeatherStatus = (state) =>
+	parseAPIStatus(getWeather(state).savedCitiesWeatherStatus);
 
 export default weatherSlice.reducer;

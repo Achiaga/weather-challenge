@@ -1,35 +1,47 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { EuiIcon } from '@elastic/eui';
+import '@elastic/eui/dist/eui_theme_light.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
-const Wrapper = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: space-around;
-	padding: 1em 0;
-`;
+import { updateModalState } from '../../features/modal-slice';
+import { getWeatherStatus } from '../../features/weather-slice';
+import './navbar.css';
 
-const NavButton = styled.div`
-	color: black;
-	a {
-		text-decoration: none;
-		color: black;
-	}
-`;
-
-const Component = () => {
-	return (
-		<Wrapper>
-			<NavButton>
-				<Link to='/'>Home</Link>
-			</NavButton>
-			<NavButton>
-				<Link to='/search'>Search</Link>
-			</NavButton>
-			<NavButton>
-				<Link to='/user-weather'>Profile</Link>
-			</NavButton>
-		</Wrapper>
+const shouldDisplayNavbar = (route) => {
+	return ['/no-register-user', '/sign-in', '/sign-up', '/profile'].includes(
+		route.pathname
 	);
 };
-export default Component;
+
+const Navbar = () => {
+	const location = useLocation();
+	const dispatch = useDispatch();
+	const { isLoading, isSuccess, hasError } = useSelector(getWeatherStatus);
+	const showModal = () => {
+		dispatch(updateModalState(true, 'search'));
+	};
+
+	if (hasError) return null;
+	if (shouldDisplayNavbar(location)) return null;
+
+	return (
+		<div className='wrapper-navbar'>
+			<div className='nav-button'>
+				<Link to='/'>
+					<EuiIcon type='cloudSunny' size='xl' />
+				</Link>
+			</div>
+			<div className='nav-button'>
+				<EuiIcon onClick={showModal} type='search' size='xl' />
+			</div>
+			<div className='nav-button'>
+				<Link to='/user-weather'>
+					<EuiIcon type='editorUnorderedList' size='xl' />
+				</Link>
+			</div>
+		</div>
+	);
+};
+export default Navbar;

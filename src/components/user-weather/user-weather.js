@@ -1,73 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import firebase from '../../firebase/firebase';
-import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { EuiIcon } from '@elastic/eui';
+import { useDispatch, useSelector } from 'react-redux';
+import { getIsUserAuth } from '../../features/user-slice';
+import { updateMainWeatherScreen } from '../../features/weather-slice';
+import { updateModalState } from '../../features/modal-slice';
 import {
-	requestLocation,
 	requestWeatherByLocation,
+	getSavedCitiesWeather,
+	getWeatherStatus,
+	getSavedCitiesWeatherStatus,
 } from '../../features/weather-slice';
-import {
-	requestSignUp,
-	requestSignIn,
-	requestSignOut,
-} from '../../features/user-slice';
+import ErrorPage from '../error';
+import MiniLoading from '../loading/mini-loading';
+import './user-weather.css';
+import EmptyState from '../empty-state';
+import FavCitieslist from './fav-cities-weather';
 
-const Wrapper = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	h3 {
-		padding: 1em 0;
-	}
-`;
-
-const UserWeather = () => {
+const UserWeather = ({ history }) => {
 	const dispatch = useDispatch();
-	const [user, setUser] = useState();
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
 
-	const handleEmail = (e) => {
-		const { value } = e.target;
-		setEmail(value);
+	const { isLoading, isSuccess, hasError } = useSelector(
+		getSavedCitiesWeatherStatus
+	);
+
+	const savedCitiesWeather = useSelector(getSavedCitiesWeather);
+	const auth = useSelector(getIsUserAuth);
+
+	const handleAddCity = () => {
+		dispatch(updateModalState(true, 'search'));
 	};
 
-	const handlePassword = (e) => {
-		const { value } = e.target;
-		setPassword(value);
+	const handleUpdateMainCity = (cityWeather) => {
+		history.push('/');
+		dispatch(updateMainWeatherScreen([cityWeather]));
 	};
 
-	const handleSignUp = () => {
-		dispatch(requestSignUp('alfonsodiezachiaga@gmail.com', '1234567'));
-	};
-
-	const handleSignIn = () => {
-		dispatch(requestSignIn('alfonso.achiaga@gmail.com', '1234567'));
-	};
-
-	const handlesSignOut = () => {
-		dispatch(requestSignOut());
-	};
+	// if (weatherError || savedCitiesError) return <ErrorPage />;
 
 	return (
-		<Wrapper>
-			{!user ? <h3>Login to see your weather list</h3> : user.email}
-			<input onChange={handleEmail} />
-			<br />
-			<input onChange={handlePassword} />
-			<br />
-			<button onClick={handleSignUp}>Sign Up</button>
-			<br />
-			<input onChange={handleEmail} />
-			<br />
-			<input onChange={handlePassword} />
-			<br />
-			<button onClick={handleSignIn}>Login</button>
-			<br />
-			<button onClick={handlesSignOut}>Log out</button>
-			<br />
-		</Wrapper>
+		<div className='user-weather-wrapper'>
+			<div className='user-weather-header'>
+				<h1 className='user-weather-title'>My Weather</h1>
+				<div className='user-weather-profile'>
+					<Link to='/profile'>
+						<EuiIcon type='managementApp' size='xl' />
+					</Link>
+				</div>
+			</div>
+			{!auth && <EmptyState />}
+			{isLoading ? (
+				<MiniLoading />
+			) : (
+				<FavCitieslist
+					savedCitiesWeather={savedCitiesWeather}
+					handleUpdateMainCity={handleUpdateMainCity}
+				/>
+			)}
+			{auth && (
+				<EuiIcon
+					onClick={handleAddCity}
+					style={{ marginTop: '1em' }}
+					type='plusInCircle'
+					size='l'
+				/>
+			)}
+		</div>
 	);
 };
 export default UserWeather;
