@@ -15,7 +15,6 @@ import Navbar from './components/navbar';
 import NoRegisterUser from './components/user-settings/no-register-user';
 import SignUp from './components/user-settings/sign-up';
 import SignIn from './components/user-settings/sign-in';
-
 import { getUserInitialPayload, getIsUserAuth } from './features/user-slice';
 
 const PrivateRoute = ({ component: Component, auth, ...rest }) => {
@@ -39,7 +38,6 @@ const App = () => {
 
 	return (
 		<Router>
-			<Navbar />
 			<Modal modalType='search' />
 			<Switch>
 				<Route exact path='/' component={Home} />
@@ -53,6 +51,7 @@ const App = () => {
 				<Route path='/sign-in' component={SignIn} />
 				<Route path='/sign-up' component={SignUp} />
 			</Switch>
+			<Navbar />
 		</Router>
 	);
 };

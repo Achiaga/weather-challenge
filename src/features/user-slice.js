@@ -14,8 +14,8 @@ import {
 import { fetchCities } from '../utils/transporter';
 import { addUserData, readUserData } from '../utils/database';
 import {
-	requestWeatherByLocation,
-	requestCity,
+	requestInitialLocationWeather,
+	requestAndSaveCities,
 	updateWeatherStatus,
 } from './weather-slice';
 
@@ -34,6 +34,7 @@ export const userSlice = createSlice({
 		addUserDataStatus: '',
 		savedCitiesStatus: '',
 		isAuth: true,
+		isUserVerified: false,
 	},
 	reducers: {
 		addUserInfo: (state, action) => {
@@ -44,10 +45,11 @@ export const userSlice = createSlice({
 		upateUserIsAuth: (state, action) => {
 			state.isAuth = action.payload.userId;
 		},
+		updateIsUserVerified: (state, action) => {
+			state.isUserVerified = action.payload;
+		},
 		updateCitiesSaved: (state, action) => {
-			action.payload.map(
-				(city) => (state.citiesSaved = [...state.citiesSaved, city])
-			);
+			state.citiesSaved = action.payload;
 		},
 		updateSignUpStatus: (state, action) => {
 			state.signUpStatus = action.payload;
@@ -78,6 +80,7 @@ export const {
 	updateCitiesSaved,
 	updateSignUpStatus,
 	updateSignInStatus,
+	updateIsUserVerified,
 	updateSignOutStatus,
 	updateSaveUserDataStatus,
 	updateAddCityFirebaseStatus,
@@ -93,26 +96,11 @@ const requestSavedCities = (userId) => async (dispatch) => {
 		batch(() => {
 			dispatch(updateSavedCitiesStatus(SUCCESS));
 			dispatch(updateCitiesSaved(results));
-			dispatch(requestWeatherByLocation(results));
+			dispatch(requestInitialLocationWeather(results));
 		});
 	} catch (err) {
 		console.error('fail update data user request');
 		dispatch(updateSavedCitiesStatus(ERROR));
-	}
-};
-
-export const requestGetUser = (user) => async (dispatch) => {
-	try {
-		if (user) {
-			console.log(user.emailVerified);
-			batch(() => {
-				dispatch(addUserInfo({ email: user.email, userId: user.uid }));
-				dispatch(requestSavedCities(user.uid));
-			});
-		} else {
-		}
-	} catch (err) {
-		console.error('It is not a persistant user', err);
 	}
 };
 
@@ -124,7 +112,7 @@ export const requestSignUp = (email, password) => async (dispatch) => {
 			dispatch(updateSignUpStatus(SUCCESS));
 			dispatch(addUserInfo({ email: user.email, userId: user.uid }));
 		});
-		// await emailVerification();
+		await emailVerification();
 		await addPersistantAuth();
 	} catch (err) {
 		console.error('fail sign up request', err);
@@ -192,13 +180,14 @@ export const requestAddCity = (userId, cities) => async (dispatch) => {
 export const getUserInitialPayload = () => async (dispatch) => {
 	try {
 		dispatch(updateWeatherStatus(LOADING));
-		fetchCities().then((results) => dispatch(requestCity(results)));
+		fetchCities().then((results) => dispatch(requestAndSaveCities(results)));
 		const user = await checkPersistantUser();
 		if (!user) return dispatch(upateUserIsAuth(false));
-		dispatch(requestSavedCities(user.uid));
-		dispatch(updateWeatherStatus(SUCCESS));
+		if (user.emailVerified) dispatch(updateIsUserVerified(user.emailVerified));
 		batch(() => {
-			dispatch(requestGetUser(user));
+			dispatch(requestSavedCities(user.uid));
+			dispatch(updateWeatherStatus(SUCCESS));
+			dispatch(addUserInfo({ email: user.email, userId: user.uid }));
 		});
 	} catch (err) {
 		console.error(err);
@@ -208,6 +197,7 @@ export const getUserInitialPayload = () => async (dispatch) => {
 export const getUserState = (state) => state.user;
 export const getUserId = (state) => getUserState(state).userId;
 export const getIsUserAuth = (state) => getUserState(state).isAuth;
+export const getIsUserVerified = (state) => getUserState(state).isUserVerified;
 export const getUserEmail = (state) => getUserState(state).email;
 export const getCitiesSaved = (state) => getUserState(state).citiesSaved;
 export const getSignUserError = (state) => getUserState(state).signUserError;

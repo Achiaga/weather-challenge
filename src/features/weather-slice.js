@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { fetchCities, fetchCityWeather } from '../utils/transporter';
 import { LOADING, SUCCESS, ERROR } from '../constants';
 import parseAPIStatus from '../utils/parse-api-status';
+import { deleteCityUser } from '../utils/database';
 import { batch } from 'react-redux';
 import axios from 'axios';
 
@@ -20,6 +21,12 @@ export const weatherSlice = createSlice({
 	reducers: {
 		addCities: (state, action) => {
 			state.cities = action.payload;
+		},
+		removeCities: (state, action) => {
+			const index = state.savedCitiesWeather.findIndex(
+				(item) => action.payload === item.municipio.NOMBRE
+			);
+			state.savedCitiesWeather.splice(index, 1);
 		},
 		updateLocationStatus: (state, action) => {
 			state.locationStatus = action.payload;
@@ -41,6 +48,7 @@ export const weatherSlice = createSlice({
 
 export const {
 	addCities,
+	removeCities,
 	addWeather,
 	updateCitiesWeather,
 	updateWeatherStatus,
@@ -56,13 +64,12 @@ const getCityWeather = async (cities) => {
 };
 
 const getCityCode = (city, cities) => {
-	console.log(city, cities);
 	return cities.filter((cityInfo) => {
 		return cityInfo.name.toLowerCase() === city.toLowerCase();
 	});
 };
 
-export const requestCity = (rawCities) => async (dispatch) => {
+export const requestAndSaveCities = (rawCities) => async (dispatch) => {
 	try {
 		dispatch(updateWeatherStatus(LOADING));
 		const cities = rawCities.map((city) => {
@@ -77,11 +84,9 @@ export const requestCity = (rawCities) => async (dispatch) => {
 			method: 'get',
 			url: 'http://ip-api.com/json',
 		});
-		console.log(data.data.city);
 		const cityWeather = await getCityWeather(
 			getCityCode(data.data.city, cities)
 		);
-		console.log(cityWeather);
 		batch(() => {
 			dispatch(addWeather(cityWeather));
 			dispatch(updateWeatherStatus(SUCCESS));
@@ -92,15 +97,16 @@ export const requestCity = (rawCities) => async (dispatch) => {
 	}
 };
 
+export const updateMainWeatherScreen = (cityWeather) => (dispatch) => {
+	dispatch(addWeather(cityWeather));
+};
+
 export const requestUpdateAddWeather = (city) => async (dispatch, getState) => {
 	try {
-		console.log(city[0]);
 		dispatch(updateSavedCitiesWeatherStatus(LOADING));
 		const cityWeather = await getCityWeather(city);
-		console.log({ cityWeather });
 		batch(() => {
-			dispatch(addWeather(cityWeather));
-			history.push('/');
+			dispatch(updateMainWeatherScreen(cityWeather));
 			dispatch(updateModalState(false));
 			dispatch(updateSavedCitiesWeatherStatus(SUCCESS));
 		});
@@ -110,18 +116,37 @@ export const requestUpdateAddWeather = (city) => async (dispatch, getState) => {
 	}
 };
 
+//TODO:  change names
 export const requestWeatherByLocation = (savedCities) => async (
 	dispatch,
 	getState
 ) => {
+	const hasCitiesSaved = getSavedCitiesWeather(getState()).length;
+	if (!hasCitiesSaved) dispatch(updateSavedCitiesWeatherStatus(LOADING));
+	requestInitialLocationWeather(savedCities);
+};
+
+//TODO:  change names
+export const requestInitialLocationWeather = (savedCities) => async (
+	dispatch
+) => {
 	try {
-		const hasCitiesSaved = getSavedCitiesWeather(getState()).length;
-		if (!hasCitiesSaved) dispatch(updateSavedCitiesWeatherStatus(LOADING));
+		dispatch(updateSavedCitiesWeatherStatus(LOADING));
 		const cityWeather = await getCityWeather(savedCities);
 		batch(() => {
 			dispatch(updateCitiesWeather(cityWeather));
 			dispatch(updateSavedCitiesWeatherStatus(SUCCESS));
 		});
+	} catch (err) {
+		console.error('fail category request', err);
+		dispatch(updateSavedCitiesWeatherStatus(ERROR));
+	}
+};
+
+export const requestDeleteCity = (userId, city) => async (dispatch) => {
+	try {
+		const deleteCity = await deleteCityUser(userId, city);
+		dispatch(removeCities(city));
 	} catch (err) {
 		console.error('fail category request', err);
 		dispatch(updateSavedCitiesWeatherStatus(ERROR));

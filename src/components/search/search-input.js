@@ -30,6 +30,7 @@ const SearchInput = ({ cities, userID }) => {
 	};
 
 	const handleAddCityFav = () => {
+		if (selectedOptions.length <= 0) return;
 		batch(() => {
 			dispatch(updateModalState(false));
 			dispatch(
@@ -40,6 +41,7 @@ const SearchInput = ({ cities, userID }) => {
 	};
 
 	const handleGetWeather = () => {
+		if (selectedOptions.length <= 0) return;
 		batch(() => {
 			dispatch(
 				requestUpdateAddWeather(denormalizeData(selectedOptions, cities))

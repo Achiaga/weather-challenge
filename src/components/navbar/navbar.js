@@ -20,7 +20,7 @@ const Navbar = () => {
 	const dispatch = useDispatch();
 	const { isLoading, isSuccess, hasError } = useSelector(getWeatherStatus);
 	const showModal = () => {
-		dispatch(updateModalState(true));
+		dispatch(updateModalState(true, 'search'));
 	};
 
 	if (hasError) return null;

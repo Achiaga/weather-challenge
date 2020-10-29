@@ -1,5 +1,5 @@
 .wrapper {
-	min-height: 100vh;
+	height: 100vh;
 	background: #2980b9; /* fallback for old browsers */
 	background: linear-gradient(
 		to bottom,
@@ -8,7 +8,6 @@
 		#74cafd
 	); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 	color: white;
-	padding-bottom: 8em;
 }
 
 .date {
@@ -90,4 +89,14 @@
 	font-size: 22px;
 	padding: 6px 0;
 	color: white;
+}
+
+@media only screen and (max-width: 600px) {
+	.title {
+		font-size: 48px;
+	}
+	.temp {
+		font-size: 90px;
+		text-align: center;
+	}
 }

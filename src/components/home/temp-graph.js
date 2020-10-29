@@ -10,6 +10,17 @@ import {
 	Legend,
 } from 'recharts';
 
+const getGraphWithd = () => {
+	const windowWithd = window.innerWidth;
+	if (windowWithd > 600) return 500;
+	return '100%';
+};
+const getGraphWithd2 = () => {
+	const windowWithd = window.innerWidth;
+	if (windowWithd > 600) return '50%';
+	return '100%';
+};
+
 const TempGraph = ({ graphData }) => {
 	const [data, setData] = useState();
 
@@ -24,43 +35,32 @@ const TempGraph = ({ graphData }) => {
 		}, []);
 	};
 
-	function ReferenceLabel(props) {
-		const { fill, value, textAnchor, fontSize, viewBox, dy, dx } = props;
-		const x = viewBox.width + viewBox.x - 7;
-		const y = viewBox.y + 30;
-		return (
-			<text
-				x={x}
-				y={y}
-				dy={dy}
-				dx={dx}
-				fill={fill}
-				fontSize={fontSize || 18}
-				textAnchor={textAnchor}>
-				{value}
-			</text>
-		);
-	}
-
 	if (!graphData) return null;
-
 	return (
-		<ResponsiveContainer width={'100%'} height={200}>
-			<LineChart
-				data={data}
-				aspect={1}
-				margin={{ top: 20, right: 20, bottom: 10, left: 10 }}>
-				<YAxis />
-				<Line
-					type='basis'
-					dot={false}
-					// label={<ReferenceLabel />}
-					dataKey='pv'
-					stroke='#ffffff'
-					strokeWidth={3}
-				/>
-			</LineChart>
-		</ResponsiveContainer>
+		<div style={{ margin: 'auto', width: getGraphWithd2() }}>
+			<ResponsiveContainer width={getGraphWithd()} height={200}>
+				<LineChart
+					data={data}
+					aspect={1}
+					margin={{ top: 20, right: 20, bottom: 10, left: 10 }}>
+					<YAxis
+						domain={['dataMin', 'dataMax']}
+						type='number'
+						width={40}
+						unit='ºC'
+						tick={{ stroke: 'white', strokeWidth: 1 }}
+						stroke='white'
+					/>
+					<Line
+						type='basis'
+						dot={false}
+						dataKey='pv'
+						stroke='#ffffff'
+						strokeWidth={3}
+					/>
+				</LineChart>
+			</ResponsiveContainer>
+		</div>
 	);
 };
 export default TempGraph;

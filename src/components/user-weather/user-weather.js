@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { EuiIcon } from '@elastic/eui';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCitiesSaved, getIsUserAuth } from '../../features/user-slice';
+import { getIsUserAuth } from '../../features/user-slice';
+import { updateMainWeatherScreen } from '../../features/weather-slice';
 import { updateModalState } from '../../features/modal-slice';
 import {
 	requestWeatherByLocation,
@@ -11,37 +12,31 @@ import {
 	getSavedCitiesWeatherStatus,
 } from '../../features/weather-slice';
 import ErrorPage from '../error';
-import LoadingPage from '../loading';
+import MiniLoading from '../loading/mini-loading';
 import './user-weather.css';
 import EmptyState from '../empty-state';
 import FavCitieslist from './fav-cities-weather';
 
-const UserWeather = () => {
+const UserWeather = ({ history }) => {
 	const dispatch = useDispatch();
-	const { isSuccess: weatherSuccess, hasError: weatherError } = useSelector(
-		getWeatherStatus
-	);
-	const {
-		isLoading: savedCitiesLoading,
-		isSuccess: savedCitiesSucces,
-		hasError: savedCitiesError,
-	} = useSelector(getSavedCitiesWeatherStatus);
 
-	const citiesSaved = useSelector(getCitiesSaved);
+	const { isLoading, isSuccess, hasError } = useSelector(
+		getSavedCitiesWeatherStatus
+	);
+
 	const savedCitiesWeather = useSelector(getSavedCitiesWeather);
 	const auth = useSelector(getIsUserAuth);
 
-	// useEffect(() => {
-	// 	dispatch(requestWeatherByLocation(citiesSaved));
-	// }, [citiesSaved]);
-
 	const handleAddCity = () => {
-		dispatch(updateModalState(true));
+		dispatch(updateModalState(true, 'search'));
 	};
 
-	if (weatherError || savedCitiesError) return <ErrorPage />;
+	const handleUpdateMainCity = (cityWeather) => {
+		history.push('/');
+		dispatch(updateMainWeatherScreen([cityWeather]));
+	};
 
-	if (savedCitiesLoading) return <LoadingPage />;
+	// if (weatherError || savedCitiesError) return <ErrorPage />;
 
 	return (
 		<div className='user-weather-wrapper'>
@@ -54,12 +49,19 @@ const UserWeather = () => {
 				</div>
 			</div>
 			{!auth && <EmptyState />}
-			<FavCitieslist savedCitiesWeather={savedCitiesWeather} />
+			{isLoading ? (
+				<MiniLoading />
+			) : (
+				<FavCitieslist
+					savedCitiesWeather={savedCitiesWeather}
+					handleUpdateMainCity={handleUpdateMainCity}
+				/>
+			)}
 			{auth && (
 				<EuiIcon
 					onClick={handleAddCity}
 					style={{ marginTop: '1em' }}
-					type='listAdd'
+					type='plusInCircle'
 					size='l'
 				/>
 			)}

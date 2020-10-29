@@ -24,3 +24,21 @@ export const readUserData = (userId) => {
 		}
 	});
 };
+export const deleteCityUser = (userId, city) => {
+	return new Promise((resolve, reject) => {
+		try {
+			firebase
+				.database()
+				.ref(fetchRoute(userId))
+				.on('value', (snapshot) => {
+					snapshot.forEach(function (childSnapshot) {
+						let childData = childSnapshot.val();
+						if (city === childData.name) childSnapshot.ref.remove();
+					});
+					resolve(city);
+				});
+		} catch {
+			reject('api failed');
+		}
+	});
+};

@@ -12,21 +12,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
 	requestSignOut,
 	getUserEmail,
-	requestDeleteUser,
+	getIsUserVerified,
 } from '../../features/user-slice';
+import { updateModalState } from '../../features/modal-slice';
 import './profile.css';
 
 const Profile = () => {
 	const dispatch = useDispatch();
 
 	const email = useSelector(getUserEmail);
+	const isVerified = useSelector(getIsUserVerified);
 
 	const handlesSignOut = () => {
 		dispatch(requestSignOut());
 	};
 
 	const handleDeleteUser = () => {
-		dispatch(requestDeleteUser());
+		dispatch(updateModalState(true, 'checkPassword'));
 	};
 
 	return (
@@ -52,8 +54,8 @@ const Profile = () => {
 					responsive={false}
 					gutterSize='xs'>
 					<EuiFlexItem grow={false}>
-						<EuiBadge color='secondary' isDisabled={true}>
-							Not Verified Email
+						<EuiBadge color='secondary' isDisabled={!isVerified}>
+							{isVerified ? 'Verified Email' : 'Not Verified Email'}
 						</EuiBadge>
 					</EuiFlexItem>
 				</EuiFlexGroup>

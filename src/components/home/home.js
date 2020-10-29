@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react';
-import { EuiTitle } from '@elastic/eui';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { getWeatherData, getWeatherStatus } from '../../features/weather-slice';
 
-import homeBg from '../../assets/rain.png';
-import homeBg2 from '../../assets/sun.png';
 import LoadingPage from '../loading';
 import ErrorPage from '../error';
 import TempGraph from './temp-graph';
+import WeatherImg from './weather-img';
 import './home.css';
 
 const Home = () => {
@@ -26,7 +24,6 @@ const Home = () => {
 			stateSky: weather,
 			fecha: date,
 			temperatura_actual: temp,
-			temperaturas: tempInterval,
 			viento: wind,
 			lluvia: rain,
 			pronostico: graphData,
@@ -40,7 +37,7 @@ const Home = () => {
 			<h2 className='weather'>{weather.description}</h2>
 			<h2 className='temp'>{temp}°</h2>
 			<div className='img-wrapper'>
-				<img className='img-bg' src={homeBg2} alt='home-bg' />
+				<WeatherImg weather={weather.description} />
 			</div>
 			<div className='details-wrapper'>
 				<div>
