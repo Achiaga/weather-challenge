@@ -1,14 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { EuiTitle, EuiIcon, EuiFlexItem, EuiButton } from '@elastic/eui';
-import { useSelector } from 'react-redux';
-import { getIsModalOpen } from '../../features/modal-slice';
-import './profile.css';
+import '../style/profile.css';
 
 const NoRegisterUser = () => {
 	return (
 		<div className='profile-container'>
-			<Link to='/'>
+			<Link to='/user-weather'>
 				<EuiIcon style={{ margin: '1em' }} type='returnKey' size='xxl' />
 			</Link>
 			<div

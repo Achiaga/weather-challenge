@@ -31,22 +31,15 @@ const SearchInput = ({ cities, userID }) => {
 
 	const handleAddCityFav = () => {
 		if (selectedOptions.length <= 0) return;
-		batch(() => {
-			dispatch(updateModalState(false));
-			dispatch(
-				requestAddCity(userID, denormalizeData(selectedOptions, cities))
-			);
-		});
+		dispatch(updateModalState(false));
+		dispatch(requestAddCity(userID, denormalizeData(selectedOptions, cities)));
 		setSelected([]);
 	};
 
 	const handleGetWeather = () => {
 		if (selectedOptions.length <= 0) return;
-		batch(() => {
-			dispatch(
-				requestUpdateAddWeather(denormalizeData(selectedOptions, cities))
-			);
-		});
+		dispatch(updateModalState(false));
+		dispatch(requestUpdateAddWeather(denormalizeData(selectedOptions, cities)));
 		setSelected([]);
 	};
 
@@ -59,6 +52,7 @@ const SearchInput = ({ cities, userID }) => {
 				selectedOptions={selectedOptions}
 				onChange={onChange}
 				style={{ paddingTop: '40px' }}
+				data-qa='search-modal-input'
 			/>
 			<div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
 				<EuiButton
@@ -68,6 +62,7 @@ const SearchInput = ({ cities, userID }) => {
 						margin: 'auto',
 						marginTop: '30px',
 					}}
+					data-qa='search-modal-city-weather-button'
 					onClick={handleGetWeather}>
 					Get Weather
 				</EuiButton>

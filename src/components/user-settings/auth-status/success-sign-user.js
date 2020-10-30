@@ -8,7 +8,7 @@ import {
 	EuiButton,
 } from '@elastic/eui';
 import { Link } from 'react-router-dom';
-import './profile.css';
+import '../style/profile.css';
 
 const SuccessSignUser = ({ title }) => {
 	return (

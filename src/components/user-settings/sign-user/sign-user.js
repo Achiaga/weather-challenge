@@ -11,7 +11,7 @@ import {
 	EuiFieldPassword,
 } from '@elastic/eui';
 import '@elastic/eui/dist/eui_theme_light.css';
-import './profile.css';
+import '../style/profile.css';
 
 const SignUser = ({
 	title,
@@ -23,7 +23,7 @@ const SignUser = ({
 }) => {
 	return (
 		<div className='profile-container '>
-			<Link to='/'>
+			<Link to='/user-weather'>
 				<EuiIcon style={{ margin: '1em' }} type='returnKey' size='xxl' />
 			</Link>
 			<EuiTitle size='l'>
@@ -53,7 +53,7 @@ const SignUser = ({
 					</EuiFormRow>
 				</EuiFlexItem>
 				<EuiFlexItem grow={false}>
-					<EuiFormRow style={{ margin: 'auto' }} hasEmptyLabelSpace>
+					<EuiFormRow className='sign-button-container' hasEmptyLabelSpace>
 						<EuiButton onClick={handleSignUser}>{title}</EuiButton>
 					</EuiFormRow>
 				</EuiFlexItem>
