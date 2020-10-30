@@ -10,6 +10,8 @@
 
 # production
 /build
+.firebaserc
+firebase.json
 
 # firebase keys
 /src/firebase/firebaseConfig.js

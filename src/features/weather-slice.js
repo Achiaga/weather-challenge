@@ -64,9 +64,13 @@ const getCityWeather = async (cities) => {
 };
 
 const getCityCode = (city, cities) => {
-	return cities.filter((cityInfo) => {
+	const matchCity = cities.filter((cityInfo) => {
 		return cityInfo.name.toLowerCase() === city.toLowerCase();
 	});
+	if (matchCity.length < 1) {
+		return [{ name: 'Barcelona', codeCity: '08', codeTown: '08019' }];
+	}
+	return matchCity;
 };
 
 export const requestAndSaveCities = (rawCities) => async (dispatch) => {
@@ -82,17 +86,17 @@ export const requestAndSaveCities = (rawCities) => async (dispatch) => {
 		dispatch(addCities(cities));
 		const data = await axios({
 			method: 'get',
-			url: 'http://ip-api.com/json',
-		});
+			url: 'https://freegeoip.app/json/',
+		}).catch(() => 'Barcelona');
 		const cityWeather = await getCityWeather(
-			getCityCode(data.data.city, cities)
+			getCityCode((data.data.city = 'Barcelona'), cities)
 		);
 		batch(() => {
 			dispatch(addWeather(cityWeather));
 			dispatch(updateWeatherStatus(SUCCESS));
 		});
 	} catch (err) {
-		console.error('fail category request', err);
+		console.error('fail city request', err);
 		dispatch(updateWeatherStatus(ERROR));
 	}
 };
@@ -111,7 +115,7 @@ export const requestUpdateAddWeather = (city) => async (dispatch, getState) => {
 			dispatch(updateSavedCitiesWeatherStatus(SUCCESS));
 		});
 	} catch (err) {
-		console.error('fail category request', err);
+		console.error('fail update weather request', err);
 		dispatch(updateSavedCitiesWeatherStatus(ERROR));
 	}
 };
@@ -138,7 +142,7 @@ export const requestInitialLocationWeather = (savedCities) => async (
 			dispatch(updateSavedCitiesWeatherStatus(SUCCESS));
 		});
 	} catch (err) {
-		console.error('fail category request', err);
+		console.error('fail initial location weather request', err);
 		dispatch(updateSavedCitiesWeatherStatus(ERROR));
 	}
 };
@@ -148,7 +152,7 @@ export const requestDeleteCity = (userId, city) => async (dispatch) => {
 		const deleteCity = await deleteCityUser(userId, city);
 		dispatch(removeCities(city));
 	} catch (err) {
-		console.error('fail category request', err);
+		console.error('fail delete city request', err);
 		dispatch(updateSavedCitiesWeatherStatus(ERROR));
 	}
 };
