@@ -26,7 +26,7 @@ const getButtonId = (ID, conditionIndex = 0) => {
 	return screen.getAllByTestId(ID)[conditionIndex];
 };
 
-describe('category selector', () => {
+describe('Nabar', () => {
 	it('should render a the navbar home button', () => {
 		renderComponent();
 		const homeButton = getButtonId(HOME_BUTTON_ID);
@@ -39,7 +39,7 @@ describe('category selector', () => {
 	});
 	it('should fire the function open modal when clicked at the navbar search button', () => {
 		const openModal = jest.fn();
-		renderComponent({ openModal });
+		renderComponent({ showModal: openModal });
 		const searchButton = getButtonId(SEARCH_BUTTON_ID);
 		fireEvent.click(searchButton);
 		expect(openModal).toHaveBeenCalled();

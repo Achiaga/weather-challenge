@@ -8,7 +8,6 @@ export const modalSlice = createSlice({
 	},
 	reducers: {
 		updateIsModalOpen: (state, action) => {
-			console.log(action.payload);
 			state.isModalOpen = action.payload.modalState;
 			state.modalType = action.payload.modalType;
 		},
@@ -20,7 +19,6 @@ export const { updateIsModalOpen } = modalSlice.actions;
 export const updateModalState = (modalState, modalType = '') => async (
 	dispatch
 ) => {
-	console.log(modalState, modalType);
 	dispatch(updateIsModalOpen({ modalState, modalType }));
 };
 

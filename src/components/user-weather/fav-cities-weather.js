@@ -1,39 +1,11 @@
 import React from 'react';
 import { EuiIcon } from '@elastic/eui';
-import './user-weather.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestDeleteCity } from '../../features/weather-slice';
 import { getUserId } from '../../features/user-slice';
+import './user-weather.css';
 
-const SavedCityCard = ({
-	cityWeather,
-	handleDeleteCity,
-	handleUpdateMainCity,
-}) => {
-	const handleCitySelected = () => handleUpdateMainCity(cityWeather);
-	const handleRemoveCity = (e) => {
-		e.stopPropagation();
-		handleDeleteCity(cityWeather.municipio.NOMBRE);
-	};
-
-	return (
-		<div className='saved-city-wrapper' onClick={handleCitySelected}>
-			<EuiIcon
-				style={{
-					position: 'absolute',
-					right: '10px',
-					top: '10px',
-					color: 'red',
-				}}
-				type='trash'
-				size='m'
-				onClick={handleRemoveCity}
-			/>
-			<h1 className='saved-city-name'>{cityWeather.municipio.NOMBRE}</h1>
-			<h1 className='saved-city-temp'>{cityWeather.temperatura_actual}°</h1>
-		</div>
-	);
-};
+import FavcitiesCard from './fav-cities-card';
 
 const FavCitieslist = ({
 	savedCitiesWeather,
@@ -52,7 +24,7 @@ const FavCitieslist = ({
 		<div style={{ height: '68vh', overflow: 'scroll', width: '100%' }}>
 			{savedCitiesWeather.map((cityWeather, index) => {
 				return (
-					<SavedCityCard
+					<FavcitiesCard
 						cityWeather={cityWeather}
 						key={cityWeather.municipio.ID_REL}
 						handleUpdateMainCity={handleUpdateMainCity}

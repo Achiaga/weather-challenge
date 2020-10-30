@@ -31,7 +31,7 @@ const getButtonId = (ID, conditionIndex = 0) => {
 	return screen.getAllByTestId(ID)[conditionIndex];
 };
 
-describe('category selector', () => {
+describe('Home Landing Page', () => {
 	it('should render the city name', () => {
 		renderComponent(initialProps);
 		const cityName = getButtonId(HOME_CITY_NAME_ID);
@@ -61,7 +61,7 @@ describe('category selector', () => {
 		const cityTemp = getButtonId(HOME_TEMP);
 		expect(cityTemp).toBeInTheDocument();
 		const { getByText } = within(cityTemp);
-		const cityTempText = getByText('22');
+		const cityTempText = getByText(/22/i);
 		expect(cityTempText).toBeInTheDocument();
 	});
 	it('should render the city wind', () => {
@@ -69,7 +69,7 @@ describe('category selector', () => {
 		const cityWind = getButtonId(HOME_WIND);
 		expect(cityWind).toBeInTheDocument();
 		const { getByText } = within(cityWind);
-		const cityWindText = getByText('10');
+		const cityWindText = getByText(/10/i);
 		expect(cityWindText).toBeInTheDocument();
 	});
 	it('should render the city chance of rain', () => {
@@ -77,7 +77,7 @@ describe('category selector', () => {
 		const cityRain = getButtonId(HOME_RAIN);
 		expect(cityRain).toBeInTheDocument();
 		const { getByText } = within(cityRain);
-		const cityRainText = getByText('50');
+		const cityRainText = getByText(/50/i);
 		expect(cityRainText).toBeInTheDocument();
 	});
 });
