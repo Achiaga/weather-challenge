@@ -1,5 +1,5 @@
 .wrapper {
-	height: 100vh;
+	min-height: 100vh;
 	background: #2980b9; /* fallback for old browsers */
 	background: linear-gradient(
 		to bottom,
@@ -75,7 +75,7 @@
 	margin: auto;
 	padding-bottom: 15px;
 	padding: 0px 40px;
-	margin-top: -45px;
+	margin-top: -120px;
 	margin-bottom: 2em;
 }
 
