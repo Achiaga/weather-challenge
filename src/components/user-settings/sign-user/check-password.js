@@ -13,18 +13,20 @@ import {
 import '@elastic/eui/dist/eui_theme_light.css';
 import {
 	getUserEmail,
-	requestSignIn,
 	requestDeleteUser,
-	getSignInStatus,
-} from '../../features/user-slice';
+	getDeleteUserStatus,
+} from '../../../features/user-slice';
+import MiniLoading from '../../loading/mini-loading';
+import StatusRequest from '../auth-status/status-request';
 
 const CheckPassword = () => {
 	const dispatch = useDispatch();
 	const [password, setPassword] = useState('');
-	const [deleteUser, setDeleteUser] = useState(false);
 
 	const email = useSelector(getUserEmail);
-	const { isSuccess } = useSelector(getSignInStatus);
+	const { isLoading, hasError } = useSelector(getDeleteUserStatus);
+	const title = 'Delete Account Error';
+	const errorMessage = 'Failed to delete user account';
 
 	const handleInput = (e) => {
 		const { value } = e.target;
@@ -32,14 +34,20 @@ const CheckPassword = () => {
 	};
 
 	const handleDeleteUser = () => {
-		dispatch(requestSignIn(email, password));
-		setDeleteUser(true);
+		dispatch(requestDeleteUser(email, password));
 	};
 
-	if (deleteUser && isSuccess) dispatch(requestDeleteUser());
+	if (isLoading) return <MiniLoading />;
 
 	return (
 		<div>
+			{hasError && (
+				<StatusRequest
+					status={'error'}
+					title={title}
+					errorMessage={errorMessage}
+				/>
+			)}
 			<Link to='/profile'>
 				<EuiIcon style={{ margin: '1em' }} type='returnKey' size='xxl' />
 			</Link>
@@ -59,7 +67,7 @@ const CheckPassword = () => {
 					</EuiFormRow>
 				</EuiFlexItem>
 				<EuiFlexItem grow={false}>
-					<EuiFormRow style={{ margin: 'auto' }} hasEmptyLabelSpace>
+					<EuiFormRow className='sign-button-container' hasEmptyLabelSpace>
 						<EuiButton color='danger' onClick={handleDeleteUser}>
 							Delete Account
 						</EuiButton>

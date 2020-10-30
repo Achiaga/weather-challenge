@@ -91,6 +91,20 @@
 	color: white;
 }
 
+.temp-graph {
+	padding-left: 100px;
+}
+
+@media only screen and (max-width: 1200px) {
+	.temp-graph {
+		padding-left: 50px;
+	}
+}
+@media only screen and (max-width: 900px) {
+	.temp-graph {
+		padding: 0;
+	}
+}
 @media only screen and (max-width: 600px) {
 	.title {
 		font-size: 48px;

@@ -8,7 +8,7 @@ import {
 } from '../../features/modal-slice';
 import { EuiOverlayMask, EuiModal, EuiModalBody } from '@elastic/eui';
 import Search from '../search';
-import CheckPassword from '../user-settings/check-password';
+import CheckPassword from '../user-settings/sign-user/check-password';
 
 const SearchModal = ({ closeModal }) => {
 	return (

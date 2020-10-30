@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-	requestSignIn,
-	getSignInStatus,
+	requestSignUp,
+	getSignUpStatus,
 	getSignUserError,
-} from '../../features/user-slice';
+} from '../../../features/user-slice';
 import SignUser from './sign-user';
-import SuccessSignUser from './success-sign-user';
-import ErrorSignUser from './error-sign-user';
+import SuccessSignUser from '../auth-status/success-sign-user';
+import StatusRequest from '../auth-status/status-request';
 
-const SignIn = () => {
+const SignUp = () => {
 	const dispatch = useDispatch();
-	const { isLoading, isSuccess, hasError } = useSelector(getSignInStatus);
+	const { isLoading, isSuccess, hasError } = useSelector(getSignUpStatus);
 	const errorMessage = useSelector(getSignUserError);
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-	const title = 'Sign in';
-	const descrip = 'Get access to your favorite cities!';
+	const title = 'Sign up';
+	const descrip = 'No spam. Not now, not ever. :) | 100% secure';
 
 	const handleInput = (e) => {
 		const { value, name } = e.target;
@@ -26,25 +26,31 @@ const SignIn = () => {
 		return setPassword(value);
 	};
 
-	const handleSignIn = () => {
-		dispatch(requestSignIn(email, password));
+	const handleSignUp = () => {
+		dispatch(requestSignUp(email, password));
 	};
 
 	if (isSuccess) return <SuccessSignUser title={title} />;
 
 	return (
 		<>
-			{hasError && <ErrorSignUser title={title} errorMessage={errorMessage} />}
+			{hasError && (
+				<StatusRequest
+					status={'error'}
+					title={title}
+					errorMessage={errorMessage}
+				/>
+			)}
 			<SignUser
 				title={title}
 				desc={descrip}
 				email={email}
 				password={password}
 				handleInput={handleInput}
-				handleSignUser={handleSignIn}
+				handleSignUser={handleSignUp}
 			/>
 		</>
 	);
 };
 
-export default SignIn;
+export default SignUp;

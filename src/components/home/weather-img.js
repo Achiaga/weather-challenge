@@ -18,7 +18,7 @@ const checkStatusWeather = (weather, values) => {
 const WeatherImg = ({ weather }) => {
 	let weatherBg = sunImg;
 	const lluvia = ['lluvia', 'lluvioso', 'llover'];
-	const nublado = ['nublado', 'nuboso'];
+	const nublado = ['nublado', 'nuboso', 'nubes'];
 	const tormenta = ['tormenta'];
 	const nieve = ['nieve'];
 

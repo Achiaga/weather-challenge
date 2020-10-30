@@ -18,24 +18,28 @@ import {
 	requestAndSaveCities,
 	updateWeatherStatus,
 } from './weather-slice';
+import { updateModalState } from './modal-slice';
+
+const initialState = {
+	userId: '',
+	email: '',
+	city: '',
+	citiesSaved: [],
+	signUpStatus: '',
+	signInStatus: '',
+	signUserError: '',
+	signOutStatus: '',
+	saveUserDataStatus: '',
+	addUserDataStatus: '',
+	savedCitiesStatus: '',
+	deleteUserStatus: '',
+	isAuth: true,
+	isUserVerified: false,
+};
 
 export const userSlice = createSlice({
 	name: 'user',
-	initialState: {
-		userId: '',
-		email: '',
-		city: '',
-		citiesSaved: [],
-		signUpStatus: '',
-		signInStatus: '',
-		signUserError: '',
-		signOutStatus: '',
-		saveUserDataStatus: '',
-		addUserDataStatus: '',
-		savedCitiesStatus: '',
-		isAuth: true,
-		isUserVerified: false,
-	},
+	initialState,
 	reducers: {
 		addUserInfo: (state, action) => {
 			state.userId = action.payload.userId;
@@ -69,8 +73,30 @@ export const userSlice = createSlice({
 		updateSavedCitiesStatus: (state, action) => {
 			state.savedCitiesStatus = action.payload;
 		},
+		updateDeleteUserStatus: (state, action) => {
+			state.deleteUserStatus = action.payload;
+		},
 		updateSignUserError: (state, action) => {
 			state.signUserError = action.payload;
+		},
+		updateEmptyState: (state, action) => {
+			state = initialState;
+		},
+		updateEmptyState: (state, action) => {
+			state.userId = '';
+			state.email = '';
+			state.city = '';
+			state.citiesSaved = [];
+			state.signUpStatus = '';
+			state.signInStatus = '';
+			state.signUserError = '';
+			state.signOutStatus = '';
+			state.saveUserDataStatus = '';
+			state.addUserDataStatus = '';
+			state.savedCitiesStatus = '';
+			state.deleteUserStatus = '';
+			state.isAuth = false;
+			state.isUserVerified = false;
 		},
 	},
 });
@@ -87,6 +113,8 @@ export const {
 	updateSavedCitiesStatus,
 	upateUserIsAuth,
 	updateSignUserError,
+	updateDeleteUserStatus,
+	updateEmptyState,
 } = userSlice.actions;
 
 const requestSavedCities = (userId) => async (dispatch) => {
@@ -152,11 +180,23 @@ export const requestSignOut = () => async (dispatch) => {
 	}
 };
 
-export const requestDeleteUser = () => async (dispatch) => {
+export const requestDeleteUser = (email, password) => async (dispatch) => {
 	try {
-		await deleteUser();
+		dispatch(updateDeleteUserStatus(LOADING));
+		await dispatch(requestSignIn(email, password));
+		const succesDeleteUSer = await deleteUser();
+		if (succesDeleteUSer) {
+			batch(() => {
+				dispatch(updateEmptyState());
+				dispatch(updateModalState(false));
+				dispatch(updateDeleteUserStatus(SUCCESS));
+			});
+		} else {
+			console.error('fail delete user');
+		}
 	} catch (err) {
 		console.error('fail delete user', err);
+		dispatch(updateDeleteUserStatus(ERROR));
 	}
 };
 
@@ -205,5 +245,7 @@ export const getSignInStatus = (state) =>
 	parseAPIStatus(getUserState(state).signInStatus);
 export const getSignUpStatus = (state) =>
 	parseAPIStatus(getUserState(state).signUpStatus);
+export const getDeleteUserStatus = (state) =>
+	parseAPIStatus(getUserState(state).deleteUserStatus);
 
 export default userSlice.reducer;

@@ -3,12 +3,19 @@
 	min-height: 100vh;
 }
 
-.profile-wrapper {
+.profile-wrapper-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.profile-wrapper-info {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	justify-content: center;
 	padding: 0 3em;
+	background: #dcdcdc42;
 }
 
 .profile-wrapper-title {
@@ -55,4 +62,16 @@
 	font-size: 20px;
 	font-weight: 500;
 	padding-bottom: 1em;
+}
+
+@media only screen and (max-width: 500px) {
+	.sign-button-container {
+		margin: auto;
+	}
+	.profile-wrapper-container {
+		display: block;
+	}
+	.profile-wrapper-info {
+		background: none;
+	}
 }

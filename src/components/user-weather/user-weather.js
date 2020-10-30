@@ -6,24 +6,42 @@ import { getIsUserAuth } from '../../features/user-slice';
 import { updateMainWeatherScreen } from '../../features/weather-slice';
 import { updateModalState } from '../../features/modal-slice';
 import {
-	requestWeatherByLocation,
 	getSavedCitiesWeather,
-	getWeatherStatus,
 	getSavedCitiesWeatherStatus,
 } from '../../features/weather-slice';
-import ErrorPage from '../error';
 import MiniLoading from '../loading/mini-loading';
 import './user-weather.css';
 import EmptyState from '../empty-state';
+import EmptyCities from '../empty-state/empty-cities';
 import FavCitieslist from './fav-cities-weather';
+
+const UserWeatherContent = ({
+	auth,
+	loading,
+	savedCitiesWeather,
+	handleUpdateMainCity,
+	handleAddCity,
+}) => {
+	if (loading) return <MiniLoading />;
+	if (!auth) return <EmptyState />;
+	if (savedCitiesWeather.length < 1)
+		return <EmptyCities handleAddCity={handleAddCity} />;
+
+	return (
+		<>
+			<FavCitieslist
+				savedCitiesWeather={savedCitiesWeather}
+				handleUpdateMainCity={handleUpdateMainCity}
+				handleAddCity={handleAddCity}
+			/>
+		</>
+	);
+};
 
 const UserWeather = ({ history }) => {
 	const dispatch = useDispatch();
 
-	const { isLoading, isSuccess, hasError } = useSelector(
-		getSavedCitiesWeatherStatus
-	);
-
+	const { isLoading } = useSelector(getSavedCitiesWeatherStatus);
 	const savedCitiesWeather = useSelector(getSavedCitiesWeather);
 	const auth = useSelector(getIsUserAuth);
 
@@ -36,8 +54,6 @@ const UserWeather = ({ history }) => {
 		dispatch(updateMainWeatherScreen([cityWeather]));
 	};
 
-	// if (weatherError || savedCitiesError) return <ErrorPage />;
-
 	return (
 		<div className='user-weather-wrapper'>
 			<div className='user-weather-header'>
@@ -48,23 +64,14 @@ const UserWeather = ({ history }) => {
 					</Link>
 				</div>
 			</div>
-			{!auth && <EmptyState />}
-			{isLoading ? (
-				<MiniLoading />
-			) : (
-				<FavCitieslist
-					savedCitiesWeather={savedCitiesWeather}
-					handleUpdateMainCity={handleUpdateMainCity}
-				/>
-			)}
-			{auth && (
-				<EuiIcon
-					onClick={handleAddCity}
-					style={{ marginTop: '1em' }}
-					type='plusInCircle'
-					size='l'
-				/>
-			)}
+			<UserWeatherContent
+				auth={auth}
+				loading={isLoading}
+				handleAddCity={handleAddCity}
+				savedCitiesWeather={savedCitiesWeather}
+				handleAddCity={handleAddCity}
+				handleUpdateMainCity={handleUpdateMainCity}
+			/>
 		</div>
 	);
 };

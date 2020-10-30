@@ -37,7 +37,9 @@ const TempGraph = ({ graphData }) => {
 
 	if (!graphData) return null;
 	return (
-		<div style={{ margin: 'auto', width: getGraphWithd2() }}>
+		<div
+			className='temp-graph'
+			style={{ margin: 'auto', width: getGraphWithd2() }}>
 			<ResponsiveContainer width={getGraphWithd()} height={200}>
 				<LineChart
 					data={data}

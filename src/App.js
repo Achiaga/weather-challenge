@@ -12,9 +12,9 @@ import Modal from './components/modal';
 import UserWeather from './components/user-weather';
 import Profile from './components/user-settings';
 import Navbar from './components/navbar';
-import NoRegisterUser from './components/user-settings/no-register-user';
-import SignUp from './components/user-settings/sign-up';
-import SignIn from './components/user-settings/sign-in';
+import NoRegisterUser from './components/user-settings/sign-user/no-register-user';
+import SignUp from './components/user-settings/sign-user/sign-up';
+import SignIn from './components/user-settings/sign-user/sign-in';
 import { getUserInitialPayload, getIsUserAuth } from './features/user-slice';
 
 const PrivateRoute = ({ component: Component, auth, ...rest }) => {
