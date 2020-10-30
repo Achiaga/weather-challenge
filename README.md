@@ -10,10 +10,11 @@ Create a web-application using React as presented below.
 - [Javascript](https://developer.mozilla.org/en-US/docs/Web/JavaScript) (ES6+)
 - [React-redux](https://redux.js.org/): for state managment
 - [@reduxjs/toolkit](https://redux-toolkit.js.org/): for state managment
-- [react-window-dynamic-list](https://github.com/gnir-work/react-window-dynamic-list): for virtualized list
-- [Styled-components](https://styled-components.com/): for styling
+- [Recharts](https://recharts.org/en-US): A composable charting library
+- [Elastic-UI](https://github.com/elastic/eui): framework for quickly building user interfaces
 - [Axios](https://github.com/axios/axios): for fetching data
 - [React Testing Library](https://testing-library.com/): for unit-testing
+- [Cypress](https://www.cypress.io/): for e-2e testing
 - [Husky](https://typicode.github.io/husky/#/): for improving workflow
 
 ## 🛠️ Installation Steps
