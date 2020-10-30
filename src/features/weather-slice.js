@@ -71,7 +71,6 @@ const getCityCode = (city, cities) => {
 
 export const requestAndSaveCities = (rawCities) => async (dispatch) => {
 	try {
-		console.log(rawCities);
 		dispatch(updateWeatherStatus(LOADING));
 		const cities = rawCities.map((city) => {
 			return {
