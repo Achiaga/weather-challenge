@@ -13,6 +13,7 @@ const NavbarButtons = ({ showModal }) => {
 			</div>
 			<div className='nav-button'>
 				<EuiIcon
+					data-qa='search-navbar'
 					data-testid='search-button-id'
 					onClick={showModal}
 					type='search'

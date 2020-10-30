@@ -23,3 +23,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('dataQa', (value, subSelector = '') => {
+	return cy.get(`[data-qa="${value}"] ${subSelector}`);
+});

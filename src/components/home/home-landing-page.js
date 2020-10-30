@@ -20,7 +20,7 @@ const HomeLandingPage = ({ weatherData }) => {
 			<h4 className='date' data-testid='home-date'>
 				{date}
 			</h4>
-			<h1 className='title' data-testid='home-city-name'>
+			<h1 className='title' data-testid='home-city-name' data-qa='city-name'>
 				{city.NOMBRE}
 			</h1>
 			<h2 className='weather' data-testid='home-city-weather'>
